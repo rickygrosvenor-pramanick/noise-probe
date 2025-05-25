@@ -90,7 +90,7 @@ class ShuffleColumnProbe(BaseProbe):
     def get_name(self):
         return 'shuffle_column'
 
-register_probe(GaussianNoiseProbe)
-register_probe(MaskFeaturesProbe)
-register_probe(FlipCategoriesProbe)
-register_probe(ShuffleColumnProbe)  
+# register_probe(GaussianNoiseProbe)
+# register_probe(MaskFeaturesProbe)
+# register_probe(FlipCategoriesProbe)
+# register_probe(ShuffleColumnProbe)  
