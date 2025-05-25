@@ -1,7 +1,7 @@
 import torch
 from typing import List
-from noiseprobe.base import BaseProbe
-
+from noiseprobe.noiseprobe.base import BaseProbe
+from noiseprobe.noiseprobe.registry import register_probe
 
 class GaussianNoiseProbe(BaseProbe):
     """
@@ -20,6 +20,9 @@ class GaussianNoiseProbe(BaseProbe):
             noise = torch.randn(X.size(0), device=X.device) * std
             X_noisy[:, col] += noise
         return X_noisy
+    
+    def get_name(self):
+        return 'gaussian_noise'
 
 
 class MaskFeaturesProbe(BaseProbe):
@@ -39,6 +42,9 @@ class MaskFeaturesProbe(BaseProbe):
             mask = torch.rand(X.size(0), device=X.device) < mask_prob
             X_masked[mask, col] = 0.0
         return X_masked
+    
+    def get_name(self):
+        return 'mask_features'
 
 
 class FlipCategoriesProbe(BaseProbe):
@@ -65,6 +71,9 @@ class FlipCategoriesProbe(BaseProbe):
         X_flipped[mask, column] = new_vals
         return X_flipped
 
+    def get_name(self):
+        return 'flip_categories'
+
 
 class ShuffleColumnProbe(BaseProbe):
     """
@@ -77,3 +86,11 @@ class ShuffleColumnProbe(BaseProbe):
         perm = torch.randperm(X.size(0), device=X.device)
         X_shuffled[:, column] = X_shuffled[perm, column]
         return X_shuffled
+
+    def get_name(self):
+        return 'shuffle_column'
+
+register_probe(GaussianNoiseProbe)
+register_probe(MaskFeaturesProbe)
+register_probe(FlipCategoriesProbe)
+register_probe(ShuffleColumnProbe)  

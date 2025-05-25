@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Type
 import torch
-import noiseprobe.registry as registry
+import noiseprobe.noiseprobe.registry as registry
 
 
 # Base class for all robustness testers
