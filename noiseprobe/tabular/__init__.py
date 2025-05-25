@@ -1,14 +1,14 @@
 # Expose tabular probes and ensure they are registered
-from .probes import (
-    GaussianNoiseProbe,
-    MaskFeaturesProbe,
-    FlipCategoriesProbe,
-    ShuffleColumnProbe
+from noiseprobe.tabular.probes import (
+    GaussianNoiseProbeTabular,
+    MaskFeaturesProbeTabular,
+    FlipCategoriesProbeTabular,
+    ShuffleColumnProbeTabular
 )
 from noiseprobe.noiseprobe.registry import register_probe
 
 # Centralize registration of all tabular probes
-register_probe(GaussianNoiseProbe)
-register_probe(MaskFeaturesProbe)
-register_probe(FlipCategoriesProbe)
-register_probe(ShuffleColumnProbe)
+register_probe(GaussianNoiseProbeTabular)
+register_probe(MaskFeaturesProbeTabular)
+register_probe(FlipCategoriesProbeTabular)
+register_probe(ShuffleColumnProbeTabular)

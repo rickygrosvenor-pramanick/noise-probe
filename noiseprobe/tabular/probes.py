@@ -1,13 +1,13 @@
 import torch
 from typing import List
 from noiseprobe.noiseprobe.base import BaseProbe
-from noiseprobe.noiseprobe.registry import register_probe
 
-class GaussianNoiseProbe(BaseProbe):
+
+class GaussianNoiseProbeTabular(BaseProbe):
     """
     Adds Gaussian noise to specified columns of a tabular tensor.
     """
-    name = 'gaussian_noise'
+    name = 'gaussian_noise_tabular'
 
     def __call__(
         self,
@@ -22,14 +22,14 @@ class GaussianNoiseProbe(BaseProbe):
         return X_noisy
     
     def get_name(self):
-        return 'gaussian_noise'
+        return 'gaussian_noise_tabular'
 
 
-class MaskFeaturesProbe(BaseProbe):
+class MaskFeaturesProbeTabular(BaseProbe):
     """
     Masks (zeroes out) values in specified columns with a given probability.
     """
-    name = 'mask_features'
+    name = 'mask_features_tabular'
 
     def __call__(
         self,
@@ -44,14 +44,14 @@ class MaskFeaturesProbe(BaseProbe):
         return X_masked
     
     def get_name(self):
-        return 'mask_features'
+        return 'mask_features_tabular'
 
 
-class FlipCategoriesProbe(BaseProbe):
+class FlipCategoriesProbeTabular(BaseProbe):
     """
     Randomly flips categorical values in a specified column.
     """
-    name = 'flip_categories'
+    name = 'flip_categories_tabular'
 
     def __call__(
         self,
@@ -72,14 +72,14 @@ class FlipCategoriesProbe(BaseProbe):
         return X_flipped
 
     def get_name(self):
-        return 'flip_categories'
+        return 'flip_categories_tabular'
 
 
-class ShuffleColumnProbe(BaseProbe):
+class ShuffleColumnProbeTabular(BaseProbe):
     """
     Shuffles the entries of a single column independently of other columns.
     """
-    name = 'shuffle_column'
+    name = 'shuffle_column_tabular'
 
     def __call__(self, X: torch.Tensor, column: int) -> torch.Tensor:
         X_shuffled = X.clone()
@@ -88,9 +88,4 @@ class ShuffleColumnProbe(BaseProbe):
         return X_shuffled
 
     def get_name(self):
-        return 'shuffle_column'
-
-# register_probe(GaussianNoiseProbe)
-# register_probe(MaskFeaturesProbe)
-# register_probe(FlipCategoriesProbe)
-# register_probe(ShuffleColumnProbe)  
+        return 'shuffle_column_tabular'

@@ -3,6 +3,7 @@ import torch
 
 import noiseprobe.noiseprobe.registry as registry
 from noiseprobe.noiseprobe.base import BaseRobustnessTester
+# Do not remove this import, it populates the registry dictionary
 import noiseprobe.tabular.probes as probes
 
 
@@ -95,10 +96,10 @@ if __name__ == '__main__':
     tester = TabularRobustnessTester(dummy_model, l2_metric, 'L2Dist', X)
     # Specify which probes to run and their parameters
     probe_configs = {
-        'gaussian_noise': {'columns': [0,1], 'std': 0.2},
-        'mask_features': {'columns': [2,3], 'mask_prob': 0.3},
-        'shuffle_column': {'column': 4},
-        'flip_categories': {'column': 4, 'num_classes': 10, 'flip_prob': 0.2}
+        'gaussian_noise_tabular': {'columns': [0,1], 'std': 0.2},
+        'mask_features_tabular': {'columns': [2,3], 'mask_prob': 0.3},
+        'shuffle_column_tabular': {'column': 4},
+        'flip_categories_tabular': {'column': 4, 'num_classes': 10, 'flip_prob': 0.2}
     }
     results = tester.evaluate(probe_kwargs=probe_configs)
     print(results)
