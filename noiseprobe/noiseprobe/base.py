@@ -2,10 +2,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Type
 import torch
+import noiseprobe.registry as registry
 
-
-# Registry for probe classes - dictionary mapping each probe’s unique name string to its implementing class
-typing_probe_registry: Dict[str, Type['BaseProbe']] = {}
 
 # Base class for all robustness testers
 class BaseRobustnessTester(ABC):
@@ -30,8 +28,7 @@ class BaseProbe(ABC):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if hasattr(cls, 'name') and cls.name:
-            typing_probe_registry[cls.name] = cls
+        registry.register_probe(cls)
 
     @abstractmethod
     def __call__(self, X: torch.Tensor, **kwargs) -> torch.Tensor:

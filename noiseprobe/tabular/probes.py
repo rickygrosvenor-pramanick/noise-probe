@@ -1,77 +1,79 @@
 import torch
-
-def add_gaussian_noise(X, columns, std=0.1):
-    """
-    Add Gaussian noise to selected columns of X.
-    
-    Args:
-        X: Tensor of shape (N, D)
-        columns: List of integer column indices
-        std: Standard deviation of the noise
-    
-    Returns:
-        X_noisy: Tensor of shape (N, D)
-    """
-    X_noisy = X.clone()
-    for col in columns:
-        # Noise vector of size Nx1
-        noise = torch.randn(X.size(0)) * std
-        X_noisy[:, col] += noise
-    return X_noisy
+from typing import List
+from noiseprobe.base import BaseProbe
 
 
-def mask_features(X, columns, mask_prob=0.1):
+class GaussianNoiseProbe(BaseProbe):
     """
-    Randomly mask (zero out) selected features with probability `mask_prob`.
-    
-    Args:
-        X: Tensor of shape (N, D)
-        columns: List of integer column indices
-        mask_prob: Probability of masking a given feature value
-    
-    Returns:
-        X_masked: Tensor of shape (N, D)
+    Adds Gaussian noise to specified columns of a tabular tensor.
     """
-    X_masked = X.clone()
-    for col in columns:
-        mask = torch.rand(X.size(0)) < mask_prob
-        X_masked[mask, col] = 0.0  # Or `float('nan')` if you handle it downstream
-    return X_masked
+    name = 'gaussian_noise'
+
+    def __call__(
+        self,
+        X: torch.Tensor,
+        columns: List[int],
+        std: float = 0.1
+    ) -> torch.Tensor:
+        X_noisy = X.clone()
+        for col in columns:
+            noise = torch.randn(X.size(0), device=X.device) * std
+            X_noisy[:, col] += noise
+        return X_noisy
 
 
-def flip_categories(X, column, num_classes, flip_prob=0.1):
+class MaskFeaturesProbe(BaseProbe):
     """
-    Randomly flip categorical values in a given column.
-    
-    Args:
-        X: LongTensor of shape (N, D)
-        column: Integer index of the column
-        num_classes: Total number of possible classes
-        flip_prob: Probability to flip each sample
-    
-    Returns:
-        X_flipped: LongTensor of shape (N, D)
+    Masks (zeroes out) values in specified columns with a given probability.
     """
-    X_flipped = X.clone()
-    mask = torch.rand(X.size(0)) < flip_prob
-    flipped_values = torch.randint(0, num_classes, size=(mask.sum(),))
-    X_flipped[mask, column] = flipped_values
-    return X_flipped
+    name = 'mask_features'
+
+    def __call__(
+        self,
+        X: torch.Tensor,
+        columns: List[int],
+        mask_prob: float = 0.1
+    ) -> torch.Tensor:
+        X_masked = X.clone()
+        for col in columns:
+            mask = torch.rand(X.size(0), device=X.device) < mask_prob
+            X_masked[mask, col] = 0.0
+        return X_masked
 
 
-def shuffle_column(X, column):
+class FlipCategoriesProbe(BaseProbe):
     """
-    Shuffle a column independently of others.
-    
-    Args:
-        X: Tensor of shape (N, D)
-        column: Integer index
-    
-    Returns:
-        X_shuffled: Tensor of shape (N, D)
+    Randomly flips categorical values in a specified column.
     """
-    X_shuffled = X.clone()
-    permuted = X_shuffled[:, column][torch.randperm(X.size(0))]
-    X_shuffled[:, column] = permuted
-    return X_shuffled
+    name = 'flip_categories'
 
+    def __call__(
+        self,
+        X: torch.Tensor,
+        column: int,
+        num_classes: int,
+        flip_prob: float = 0.1
+    ) -> torch.Tensor:
+        X_flipped = X.clone().long()
+        mask = torch.rand(X.size(0), device=X.device) < flip_prob
+        new_vals = torch.randint(
+            low=0,
+            high=num_classes,
+            size=(mask.sum().item(),),
+            device=X.device
+        )
+        X_flipped[mask, column] = new_vals
+        return X_flipped
+
+
+class ShuffleColumnProbe(BaseProbe):
+    """
+    Shuffles the entries of a single column independently of other columns.
+    """
+    name = 'shuffle_column'
+
+    def __call__(self, X: torch.Tensor, column: int) -> torch.Tensor:
+        X_shuffled = X.clone()
+        perm = torch.randperm(X.size(0), device=X.device)
+        X_shuffled[:, column] = X_shuffled[perm, column]
+        return X_shuffled
