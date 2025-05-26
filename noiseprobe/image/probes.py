@@ -7,7 +7,7 @@ from PIL import Image
 import io
 import cv2
 from scipy.ndimage import gaussian_filter
-from noiseprobe.noiseprobe.registry import registry
+# import noiseprobe.noiseprobe.registry as registry
 from noiseprobe.noiseprobe.base import BaseProbe
 
 # 1. Noise perturbations
@@ -233,12 +233,27 @@ class JpegCompressionProbeImage(BaseProbe):
     name = 'jpeg_compression_image'
 
     def __call__(self, X: torch.Tensor, quality: int = 50) -> torch.Tensor:
-        pil = TF.to_pil_image(X)
-        buf = io.BytesIO()
-        pil.save(buf, format='JPEG', quality=quality)
-        buf.seek(0)
-        comp = Image.open(buf)
-        return TF.to_tensor(comp).to(X.device)
+        single_image = (X.dim() == 3)
+        imgs = X.unsqueeze(0) if single_image else X
+
+        out_images = []
+        for img in imgs:
+            # Move to CPU and convert to PIL
+            pil_img = TF.to_pil_image(img.cpu())
+            buf = io.BytesIO()
+            pil_img.save(buf, format='JPEG', quality=quality)
+            buf.seek(0)
+            compressed = Image.open(buf).convert('RGB')
+            # Convert back to tensor and original device
+            tensor_img = TF.to_tensor(compressed).to(X.device)
+            out_images.append(tensor_img)
+
+        result = torch.stack(out_images, dim=0)
+        # Remove batch dim if input was single
+        return result.squeeze(0) if single_image else result
+    
+    def get_name(self):
+        return 'jpeg_compression_image'
 
 class DownsampleUpsampleProbeImage(BaseProbe):
     name = 'down_upsample_image'
