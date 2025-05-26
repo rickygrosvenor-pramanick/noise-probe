@@ -1,10 +1,12 @@
-from typing import Dict, Type, List
-from .base import BaseProbe
+from typing import Dict, Type, List, TYPE_CHECKING
 
-# Global registry mapping each probe’s name to its implementing class
-probe_registry: Dict[str, Type[BaseProbe]] = {}
+if TYPE_CHECKING:
+    from .base import BaseProbe
 
-def register_probe(cls: Type[BaseProbe]) -> Type[BaseProbe]:
+# Global registry mapping each probe's name to its implementing class
+probe_registry: Dict[str, Type['BaseProbe']] = {}
+
+def register_probe(cls: Type['BaseProbe']) -> Type['BaseProbe']:
     """
     Class decorator to register a new BaseProbe subclass.
 
@@ -20,7 +22,7 @@ def register_probe(cls: Type[BaseProbe]) -> Type[BaseProbe]:
     probe_registry[name] = cls
     return cls
 
-def get_probe_cls(name: str) -> Type[BaseProbe]:
+def get_probe_cls(name: str) -> Type['BaseProbe']:
     """
     Retrieve the probe class by its registered name.
 

@@ -2,8 +2,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Type
 import torch
-import noiseprobe.noiseprobe.registry as registry
-
 
 # Base class for all robustness testers
 class BaseRobustnessTester(ABC):
@@ -28,6 +26,8 @@ class BaseProbe(ABC):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
+        # Import here to avoid circular dependency
+        import noiseprobe.noiseprobe.registry as registry
         registry.register_probe(cls)
 
     @abstractmethod
